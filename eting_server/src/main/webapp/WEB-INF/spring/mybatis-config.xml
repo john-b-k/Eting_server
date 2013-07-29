@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <!DOCTYPE configuration
+ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+		<!-- disable lazy loading for testing as we do not want CGLIB on our classpath -->
+		<setting name="lazyLoadingEnabled" value="false" />
+		<setting name="useGeneratedKeys" value="false" />
+
+		<setting name="cacheEnabled" value="true" />
+		<setting name="multipleResultSetsEnabled" value="true" />
+		<setting name="useColumnLabel" value="true" />
+		<setting name="defaultExecutorType" value="SIMPLE" />
+		<setting name="defaultStatementTimeout" value="100" />
+		<setting name="safeRowBoundsEnabled" value="false" />
+		<setting name="mapUnderscoreToCamelCase" value="false" />
+		<setting name="localCacheScope" value="SESSION" />
+		<setting name="jdbcTypeForNull" value="OTHER" />
+		<setting name="lazyLoadTriggerMethods" value="equals,clone,hashCode,toString" />
+	</settings>
+
+	<typeAliases>
+		<typeAlias alias="etingVO" type="com.gif.eting.vo.EtingVO" />
+		<typeAlias alias="stampVO" type="com.gif.eting.vo.StampVO" />
+
+	</typeAliases>
+</configuration>

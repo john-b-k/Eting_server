@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gif.eting.dao.EtingDAO">
+
+<!-- 
+		SELECT
+			  story_id
+			  ,content
+			  ,phone_id
+			  ,story_date
+		FROM lifenjoys.gif_story_story_master
+		WHERE phone_id = #{phone_id}
+		ORDER by story_date desc
+		 -->
+		 
+	<select id="getEtingMasterList" parameterType="etingVO" resultType="etingVO">		
+	    SELECT
+		  gif_story_story_master.story_id
+		  ,content
+		  ,phone_id
+		  ,story_date
+		  ,gif_story_stamp_master.stamp_name
+		FROM lifenjoys.gif_story_story_master
+	    LEFT OUTER JOIN lifenjoys.gif_story_story_stamp_mapping
+	    ON gif_story_story_master.story_id = gif_story_story_stamp_mapping.story_id
+	    LEFT OUTER JOIN lifenjoys.gif_story_stamp_master
+	    ON gif_story_story_stamp_mapping.stamp_id = gif_story_stamp_master.stamp_id    
+		WHERE phone_id = #{phone_id}
+		ORDER by story_date desc
+	</select>
+	
+	<insert id="insEtingMaster" parameterType="etingVO"
+	useGeneratedKeys="true" keyProperty="story_id">
+	INSERT INTO
+	lifenjoys.gif_story_story_master
+		(content, phone_id, story_date)
+	VALUES
+		(#{content}, #{phone_id}, curdate())
+	</insert>
+
+	<update id="updEtingMaster" parameterType="etingVO">
+		UPDATE lifenjoys.gif_story_story_master 
+		<set>
+			<if test="exp_type != null">content= #{content},</if>
+		</set>
+		WHERE story_id = #{story_id}
+	</update>
+
+	<delete id="delEtingMaster" parameterType="etingVO">
+		DELETE FROM lifenjoys.gif_story_story_master
+		WHERE story_id = #{story_id}
+	</delete>
+	
+	<!-- 이야기 대기열에 이야기를 넣는다 -->
+	<insert id="insEtingQueue" parameterType="etingVO">
+	INSERT INTO lifenjoys.gif_story_story_queue
+		(story_id, phone_id) 
+	VALUES 
+		(#{story_id}, #{phone_id})
+	</insert>
+	
+	<!-- 자신이 쓰지 않은 이야기를 받아오기 -->
+	<select id="getEtingFromQueue" parameterType="etingVO" resultType="etingVO">
+		SELECT
+			  story_id
+		FROM lifenjoys.gif_story_story_queue
+		WHERE phone_id != #{phone_id}
+		LIMIT 1
+	</select>
+	
+	<!-- 대기열에서 받아온 이야기를 대기열에서 지우기 -->
+	<delete id="delEtingFromQueue" parameterType="etingVO">
+		DELETE FROM lifenjoys.gif_story_story_queue
+		WHERE story_id = #{story_id}
+	</delete>
+	
+	<!-- 받은이야기함에 넣는다. -->
+	<insert id="insRecievedEting" parameterType="etingVO">
+	INSERT INTO lifenjoys.gif_story_recieved_story
+		(story_id, phone_id) 
+	VALUES 
+		(#{story_id}, #{phone_id})
+	</insert>
+	
+	<!-- 받은이야기함에서 읽지않은 이야기를 받아오기 -->
+	<select id="getEtingFromRecieved" parameterType="etingVO" resultType="etingVO">	
+		SELECT 
+			gif_story_recieved_story.story_id, 
+			gif_story_story_master.content, 
+			gif_story_story_master.story_date 
+		FROM lifenjoys.gif_story_recieved_story INNER JOIN lifenjoys.gif_story_story_master 
+		ON  gif_story_recieved_story.story_id = gif_story_story_master.story_id  
+		WHERE gif_story_recieved_story.phone_id = #{phone_id}
+		ORDER BY gif_story_recieved_story.story_id desc
+		LIMIT 5
+	</select>
+	
+	<!-- 스탬프 불러오기 -->
+	<select id="getStamp" resultType="stampVO">	
+		SELECT 
+			stamp_id
+			,stamp_name
+		FROM lifenjoys.gif_story_stamp_master
+	</select>
+	
+	<!-- 스탬프저장 -->
+	<insert id="insStampToEting" parameterType="stampVO">
+	INSERT INTO
+	lifenjoys.gif_story_story_stamp_mapping
+		(story_id, stamp_id)
+	VALUES
+		(#{story_id}, #{stamp_id})
+	</insert>
+	
+	<!-- 스탬프찍은 이야기를 받은이야기함에서 지우기 -->
+	<delete id="delEtingFromRecieved" parameterType="stampVO">
+		DELETE FROM lifenjoys.gif_story_recieved_story
+		WHERE story_id = #{story_id}
+	</delete>
+	
+	<!-- 스토리에 해당하는 스탬프 불러오기 -->
+	<select id="getStampByEting" resultType="stampVO">	
+		SELECT 
+			gif_story_story_stamp_mapping.stamp_id
+			,gif_story_stamp_master.stamp_name
+		FROM lifenjoys.gif_story_story_stamp_mapping 
+		   INNER JOIN lifenjoys.gif_story_stamp_master
+		   ON  gif_story_story_stamp_mapping.stamp_id = gif_story_stamp_master.stamp_id
+		WHERE gif_story_story_stamp_mapping.story_id = #{story_id}
+	</select>
+	
+</mapper>
