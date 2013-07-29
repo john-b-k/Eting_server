@@ -11,10 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.View;
 
-import com.gif.eting.dao.EtingDAO;
+import com.gif.eting.dao.EtingMapper;
 import com.gif.eting.vo.EtingVO;
 import com.gif.eting.vo.StampVO;
 
@@ -27,7 +28,7 @@ public class MainController {
 	private View jsonView;
 
 	@Autowired
-	EtingDAO etingDao;
+	EtingMapper etingMapper;
 
 	/*
 	 * 테스트
@@ -54,12 +55,12 @@ public class MainController {
 		HttpSession session = request.getSession(true);
 		session.setAttribute("phoneId", phoneId); // 세션에 phoneId 저장
 
-		EtingVO sm = new EtingVO();
-		sm.setPhone_id(phoneId);
-		List<EtingVO> list = etingDao.getStoryFromRecieved(sm);
+		EtingVO et = new EtingVO();
+		et.setPhone_id(phoneId);
+		List<EtingVO> list = etingMapper.getEtingFromRecieved(et);
 		request.setAttribute("list", list);
 
-		List<StampVO> stampList = etingDao.getStamp();
+		List<StampVO> stampList = etingMapper.getStamp();
 		request.setAttribute("stampList", stampList);
 
 		return "main";
@@ -79,33 +80,30 @@ public class MainController {
 	// 4. 가져온 이야기는 대기열에서 삭제한다. (story_queue),
 	// 5. 가져온 이야기를 자신의 받은이야기함에 넣는다.(recieved_story)
 	@RequestMapping(value = "/insert")
-	public String insert(HttpServletRequest request) {
-		HttpSession session = request.getSession(true);
-		String phoneId = (String) session.getAttribute("phoneId");
-		String content = request.getParameter("content");
+	public View insert(@ModelAttribute EtingVO et, Model model) {
+		String phoneId = et.getPhone_id(); // 입력한사람 기기 고유값
 
-		EtingVO sm = new EtingVO();
-		sm.setPhone_id(phoneId);
-		sm.setContent(content);
+		etingMapper.insEting(et); // 1. 이야기저장
+		etingMapper.insEtingQueue(et); // 2. 이야기대기열에 저장
 
-		etingDao.insEtingVO(sm); // 1. 이야기저장
-		etingDao.insStoryQueue(sm); // 2. 이야기대기열에 저장
-
-		sm = etingDao.getStoryFromQueue(sm); // 3. 대기열에서 이야기를 가져온다
+		et = etingMapper.getEtingFromQueue(et); // 3. 대기열에서 이야기를 가져온다
 
 		// 받아온게 있으면
-		if (sm != null) {
-			etingDao.delStoryFromQueue(sm);
-			sm.setPhone_id(phoneId);
-			etingDao.insRecievedStory(sm); // 5.대기열에서 가져온 이야기가 있으면 받은이야기함에 넣는다.
+		if (et != null) {
+			etingMapper.delEtingFromQueue(et); // 4. 가져온 이야기는 대기열에서 삭제한다.
+			et.setPhone_id(phoneId); // phoneId를 입력한사람의 것으로 바꿈.
+			etingMapper.insRecievedEting(et); // 5.대기열에서 가져온 이야기가 있으면 받은이야기함에 넣는다.
+			// 대기열에서 가져온 이야기가 있으면 json으로 입력한사람 기기로 리턴해준다
+			model.addAttribute("story", et);
 		} else {
-			sm = new EtingVO();
-			sm.setPhone_id(phoneId);
+			// 없으면 뭐행?
+			et = new EtingVO();
+			et.setPhone_id(phoneId);
+			// 대기열에서 가져온 이야기가 없으면 아무것도 없음 :p
+			model.addAttribute("story", null);
 		}
 
-		// 자기 이야기 목록 받아오기
-		setStoryList(request, sm);
-		return "list"; // 이야기를 등록하고 목록화면으로 이동
+		return jsonView;
 	}
 
 	// 이야기 목록 화면
@@ -113,17 +111,17 @@ public class MainController {
 	public String list(HttpServletRequest request) {
 		HttpSession session = request.getSession(true);
 		String phoneId = (String) session.getAttribute("phoneId");
-		EtingVO sm = new EtingVO();
-		sm.setPhone_id(phoneId);
+		EtingVO et = new EtingVO();
+		et.setPhone_id(phoneId);
 
 		// 자기 이야기 목록 받아오기
-		setStoryList(request, sm);
+		setEtingList(request, et);
 		return "list";
 	}
 
 	// 자기이야기 목록
-	public void setStoryList(HttpServletRequest request, EtingVO sm) {
-		List<EtingVO> list = etingDao.getEtingVOList(sm);
+	public void setEtingList(HttpServletRequest request, EtingVO et) {
+		List<EtingVO> list = etingMapper.getEtingList(et);
 		request.setAttribute("list", list);
 	}
 
@@ -134,12 +132,12 @@ public class MainController {
 		String storyId = request.getParameter("storyId");
 		String stampId = request.getParameter("stampId");
 
-		StampVO sm = new StampVO();
-		sm.setStamp_id(stampId);
-		sm.setStory_id(storyId);
+		StampVO et = new StampVO();
+		et.setStamp_id(stampId);
+		et.setStory_id(storyId);
 
-		etingDao.insStampToStory(sm); // 스탬프찍기
-		etingDao.delStoryFromRecieved(sm); // 스탬프찍은 이야기를 받음이야기함에서 지우기
+		etingMapper.insStampToEting(et); // 스탬프찍기
+		etingMapper.delEtingFromRecieved(et); // 스탬프찍은 이야기를 받음이야기함에서 지우기
 
 		return this.main(request);
 	}

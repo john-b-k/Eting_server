@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.gif.eting.dao.EtingDAO">
+<mapper namespace="com.gif.eting.dao.EtingMapper">
 
 <!-- 
 		SELECT
@@ -15,7 +15,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		ORDER by story_date desc
 		 -->
 		 
-	<select id="getEtingMasterList" parameterType="etingVO" resultType="etingVO">		
+	<select id="getEtingList" parameterType="etingVO" resultType="etingVO">		
 	    SELECT
 		  gif_story_story_master.story_id
 		  ,content
@@ -31,7 +31,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		ORDER by story_date desc
 	</select>
 	
-	<insert id="insEtingMaster" parameterType="etingVO"
+	<insert id="insEting" parameterType="etingVO"
 	useGeneratedKeys="true" keyProperty="story_id">
 	INSERT INTO
 	lifenjoys.gif_story_story_master
@@ -40,7 +40,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		(#{content}, #{phone_id}, curdate())
 	</insert>
 
-	<update id="updEtingMaster" parameterType="etingVO">
+	<update id="updEting" parameterType="etingVO">
 		UPDATE lifenjoys.gif_story_story_master 
 		<set>
 			<if test="exp_type != null">content= #{content},</if>
@@ -48,7 +48,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		WHERE story_id = #{story_id}
 	</update>
 
-	<delete id="delEtingMaster" parameterType="etingVO">
+	<delete id="delEting" parameterType="etingVO">
 		DELETE FROM lifenjoys.gif_story_story_master
 		WHERE story_id = #{story_id}
 	</delete>
@@ -65,7 +65,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<select id="getEtingFromQueue" parameterType="etingVO" resultType="etingVO">
 		SELECT
 			  story_id
+			  ,content
+			  ,story_date
 		FROM lifenjoys.gif_story_story_queue
+		NATURAL JOIN gif_story_story_master
 		WHERE phone_id != #{phone_id}
 		LIMIT 1
 	</select>
@@ -120,7 +123,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		WHERE story_id = #{story_id}
 	</delete>
 	
-	<!-- 스토리에 해당하는 스탬프 불러오기 -->
+	<!-- 스토리에 해당하는 스탬프 불러오기 
 	<select id="getStampByEting" resultType="stampVO">	
 		SELECT 
 			gif_story_story_stamp_mapping.stamp_id
@@ -130,5 +133,5 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		   ON  gif_story_story_stamp_mapping.stamp_id = gif_story_stamp_master.stamp_id
 		WHERE gif_story_story_stamp_mapping.story_id = #{story_id}
 	</select>
-	
+	-->
 </mapper>
