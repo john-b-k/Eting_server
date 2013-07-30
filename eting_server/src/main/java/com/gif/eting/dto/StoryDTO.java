@@ -1,8 +1,8 @@
-package com.gif.eting.vo;
+package com.gif.eting.dto;
 
-public class EtingVO {
+public class StoryDTO {
 
-	public EtingVO() {
+	public StoryDTO() {
 	}
 
 	private String story_id;

@@ -21,8 +21,8 @@
 	</settings>
 
 	<typeAliases>
-		<typeAlias alias="etingVO" type="com.gif.eting.vo.EtingVO" />
-		<typeAlias alias="stampVO" type="com.gif.eting.vo.StampVO" />
+		<typeAlias alias="storyDto" type="com.gif.eting.dto.StoryDTO" />
+		<typeAlias alias="stampDto" type="com.gif.eting.dto.StampDTO" />
 
 	</typeAliases>
 </configuration>

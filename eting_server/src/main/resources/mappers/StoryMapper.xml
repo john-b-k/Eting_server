@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.gif.eting.dao.EtingMapper">
+<mapper namespace="com.gif.eting.dao.StoryMapper">
 
 <!-- 
 		SELECT
@@ -15,7 +15,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		ORDER by story_date desc
 		 -->
 		 
-	<select id="getEtingList" parameterType="etingVO" resultType="etingVO">		
+	<select id="getStoryList" parameterType="storyDTO" resultType="storyDTO">		
 	    SELECT
 		  gif_story_story_master.story_id
 		  ,content
@@ -31,7 +31,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		ORDER by story_date desc
 	</select>
 	
-	<insert id="insEting" parameterType="etingVO"
+	<insert id="insStory" parameterType="storyDTO"
 	useGeneratedKeys="true" keyProperty="story_id">
 	INSERT INTO
 	lifenjoys.gif_story_story_master
@@ -40,7 +40,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		(#{content}, #{phone_id}, curdate())
 	</insert>
 
-	<update id="updEting" parameterType="etingVO">
+	<update id="updStory" parameterType="storyDTO">
 		UPDATE lifenjoys.gif_story_story_master 
 		<set>
 			<if test="exp_type != null">content= #{content},</if>
@@ -48,13 +48,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		WHERE story_id = #{story_id}
 	</update>
 
-	<delete id="delEting" parameterType="etingVO">
+	<delete id="delStory" parameterType="storyDTO">
 		DELETE FROM lifenjoys.gif_story_story_master
 		WHERE story_id = #{story_id}
 	</delete>
 	
 	<!-- 이야기 대기열에 이야기를 넣는다 -->
-	<insert id="insEtingQueue" parameterType="etingVO">
+	<insert id="insStoryQueue" parameterType="storyDTO">
 	INSERT INTO lifenjoys.gif_story_story_queue
 		(story_id, phone_id) 
 	VALUES 
@@ -62,7 +62,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</insert>
 	
 	<!-- 자신이 쓰지 않은 이야기를 받아오기 -->
-	<select id="getEtingFromQueue" parameterType="etingVO" resultType="etingVO">
+	<select id="getStoryFromQueue" parameterType="storyDTO" resultType="storyDTO">
 		SELECT
 			  story_id
 			  ,content
@@ -74,13 +74,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</select>
 	
 	<!-- 대기열에서 받아온 이야기를 대기열에서 지우기 -->
-	<delete id="delEtingFromQueue" parameterType="etingVO">
+	<delete id="delStoryFromQueue" parameterType="storyDTO">
 		DELETE FROM lifenjoys.gif_story_story_queue
 		WHERE story_id = #{story_id}
 	</delete>
 	
 	<!-- 받은이야기함에 넣는다. -->
-	<insert id="insRecievedEting" parameterType="etingVO">
+	<insert id="insRecievedStory" parameterType="storyDTO">
 	INSERT INTO lifenjoys.gif_story_recieved_story
 		(story_id, phone_id) 
 	VALUES 
@@ -88,7 +88,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</insert>
 	
 	<!-- 받은이야기함에서 읽지않은 이야기를 받아오기 -->
-	<select id="getEtingFromRecieved" parameterType="etingVO" resultType="etingVO">	
+	<select id="getStoryFromRecieved" parameterType="storyDTO" resultType="storyDTO">	
 		SELECT 
 			gif_story_recieved_story.story_id, 
 			gif_story_story_master.content, 
@@ -101,7 +101,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</select>
 	
 	<!-- 스탬프 불러오기 -->
-	<select id="getStamp" resultType="stampVO">	
+	<select id="getStamp" resultType="stampDTO">	
 		SELECT 
 			stamp_id
 			,stamp_name
@@ -109,7 +109,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</select>
 	
 	<!-- 스탬프저장 -->
-	<insert id="insStampToEting" parameterType="stampVO">
+	<insert id="insStampToStory" parameterType="stampDTO">
 	INSERT INTO
 	lifenjoys.gif_story_story_stamp_mapping
 		(story_id, stamp_id)
@@ -118,13 +118,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</insert>
 	
 	<!-- 스탬프찍은 이야기를 받은이야기함에서 지우기 -->
-	<delete id="delEtingFromRecieved" parameterType="stampVO">
+	<delete id="delStoryFromRecieved" parameterType="stampDTO">
 		DELETE FROM lifenjoys.gif_story_recieved_story
 		WHERE story_id = #{story_id}
 	</delete>
 	
 	<!-- 스토리에 해당하는 스탬프 불러오기 
-	<select id="getStampByEting" resultType="stampVO">	
+	<select id="getStampByStory" resultType="stampDTO">	
 		SELECT 
 			gif_story_story_stamp_mapping.stamp_id
 			,gif_story_stamp_master.stamp_name

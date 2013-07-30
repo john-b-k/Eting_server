@@ -6,8 +6,8 @@
 
 
 	<!-- Mapper 설정 -->
-	<bean id="etingMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
-		<property name="mapperInterface" value="com.gif.eting.dao.EtingMapper" />
+	<bean id="storyMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.gif.eting.dao.StoryMapper" />
 		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
 	</bean>
 

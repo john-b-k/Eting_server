@@ -1,8 +1,8 @@
-package com.gif.eting.vo;
+package com.gif.eting.dto;
 
-public class StampVO {
+public class StampDTO {
 
-	public StampVO() {
+	public StampDTO() {
 	}
 
 	private String story_id;

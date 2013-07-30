@@ -5,71 +5,71 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
-import com.gif.eting.vo.EtingVO;
-import com.gif.eting.vo.StampVO;
+import com.gif.eting.dto.StampDTO;
+import com.gif.eting.dto.StoryDTO;
 
-public interface EtingMapper {
+public interface StoryMapper {
 	@Select("SELECT * FROM gif_story_story_master WHERE story_id = #{story_id}")
-	public EtingVO getEting(@Param("story_id") int storyId);
+	public StoryDTO getStory(@Param("story_id") String storyId);
 
 	/*
 	 * 이야기 목록 조회
 	 */
-	public List<EtingVO> getEtingList(EtingVO etingVo);
+	public List<StoryDTO> getStoryList(StoryDTO storyDto);
 
 	/*
 	 * 이야기 등록
 	 */
-	public int insEting(EtingVO etingVo);
+	public int insStory(StoryDTO storyDto);
 
 	/*
 	 * 이야기 수정
 	 */
-	public int updEting(EtingVO etingVo);
+	public int updStory(StoryDTO storyDto);
 
 	/*
 	 * 이야기 삭제
 	 */
-	public int delEting(EtingVO etingVo);
+	public int delStory(StoryDTO storyDto);
 
 	/*
 	 * 이야기 대기열에 이야기 등록
 	 */
-	public int insEtingQueue(EtingVO etingVo);
+	public int insStoryQueue(StoryDTO storyDto);
 
 	/*
 	 * 대기열에서 이야기를 받아온다
 	 */
-	public EtingVO getEtingFromQueue(EtingVO etingVo);
+	public StoryDTO getStoryFromQueue(StoryDTO storyDto);
 
 	/*
 	 * 대기열에서 받아온 이야기는 대기열에서 삭제
 	 */
-	public int delEtingFromQueue(EtingVO etingVo);
+	public int delStoryFromQueue(StoryDTO storyDto);
 
 	/*
 	 * 받은이야기함에 등록
 	 */
-	public int insRecievedEting(EtingVO etingVo);
+	public int insRecievedStory(StoryDTO storyDto);
 
 	/*
 	 * 받은이야기함에서 불러오기
 	 */
-	public List<EtingVO> getEtingFromRecieved(EtingVO etingVo);
+	public List<StoryDTO> getStoryFromRecieved(StoryDTO storyDto);
 
 	/*
 	 * 사용가능한 스탬프 불러오기
 	 */
-	public List<StampVO> getStamp();
+	public List<StampDTO> getStamp();
 
 	/*
 	 * 스탬프찍기
 	 */
-	public int insStampToEting(StampVO stampVO);
+	public int insStampToStory(StampDTO stampDto);
 
 	/*
 	 * 스탬프찍은 이야기를 받은이야기함에서 지우기
 	 */
-	public int delEtingFromRecieved(StampVO stampVO);
+	public int delStoryFromRecieved(StampDTO stampDto);
 
 }
