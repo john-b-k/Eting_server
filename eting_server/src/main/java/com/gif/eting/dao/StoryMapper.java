@@ -71,5 +71,10 @@ public interface StoryMapper {
 	 * 스탬프찍은 이야기를 받은이야기함에서 지우기
 	 */
 	public int delStoryFromRecieved(StampDTO stampDto);
+	
+	/*
+	 * 이야기ID를 갖고 스탬프 불러오기
+	 */
+	public List<StampDTO> getStampByStory(String storyId);
 
 }

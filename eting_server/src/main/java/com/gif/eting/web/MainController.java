@@ -79,8 +79,8 @@ public class MainController {
 	// 3. 대기열에서 이야기를 가져온다 (story_queue),
 	// 4. 가져온 이야기는 대기열에서 삭제한다. (story_queue),
 	// 5. 가져온 이야기를 자신의 받은이야기함에 넣는다.(recieved_story)
-	@RequestMapping(value = "/insert")
-	public View insert(@ModelAttribute StoryDTO et, Model model) {
+	@RequestMapping(value = "/saveStory")
+	public View saveStory(@ModelAttribute StoryDTO et, Model model) {
 		String phoneId = et.getPhone_id(); // 입력한사람 기기 고유값
 
 		storyMapper.insStory(et); // 1. 이야기저장
@@ -128,19 +128,24 @@ public class MainController {
 
 	// 스탬프찍기
 	// 스탬프 찍고난 후 해당 스토리를 받은이야기함에서 지우기
-	@RequestMapping(value = "/stamp")
-	public String stamp(HttpServletRequest request) {
-		String storyId = request.getParameter("storyId");
-		String stampId = request.getParameter("stampId");
-
-		StampDTO et = new StampDTO();
-		et.setStamp_id(stampId);
-		et.setStory_id(storyId);
+	@RequestMapping(value = "/saveStamp")
+	public View saveStamp(StampDTO et) {
 
 		storyMapper.insStampToStory(et); // 스탬프찍기
 		storyMapper.delStoryFromRecieved(et); // 스탬프찍은 이야기를 받음이야기함에서 지우기
 
-		return this.main(request);
+		return jsonView;
+	}
+
+	// 스탬프 정보 폰에 전송
+	@RequestMapping(value = "/getStamp")
+	public View getStamp(HttpServletRequest request, Model model) {
+		String storyId = request.getParameter("storyId");
+
+		List<StampDTO> stampList = storyMapper.getStampByStory(storyId); // 스탬프찍기
+		model.addAttribute("stampList", stampList);
+
+		return jsonView;
 	}
 
 }

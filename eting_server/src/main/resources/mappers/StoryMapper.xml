@@ -122,16 +122,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		DELETE FROM lifenjoys.gif_story_recieved_story
 		WHERE story_id = #{story_id}
 	</delete>
-	
-	<!-- 스토리에 해당하는 스탬프 불러오기 
-	<select id="getStampByStory" resultType="stampDTO">	
-		SELECT 
+
+	<!-- 스토리에 해당하는 스탬프 불러오기 -->
+	<select id="getStampByStory" parameterType="String" resultType="stampDTO">
+		SELECT
 			gif_story_story_stamp_mapping.stamp_id
 			,gif_story_stamp_master.stamp_name
-		FROM lifenjoys.gif_story_story_stamp_mapping 
-		   INNER JOIN lifenjoys.gif_story_stamp_master
-		   ON  gif_story_story_stamp_mapping.stamp_id = gif_story_stamp_master.stamp_id
+		FROM lifenjoys.gif_story_story_stamp_mapping
+		LEFT OUTER JOIN lifenjoys.gif_story_stamp_master
+		ON gif_story_story_stamp_mapping.stamp_id =
+			gif_story_stamp_master.stamp_id
 		WHERE gif_story_story_stamp_mapping.story_id = #{story_id}
 	</select>
-	-->
 </mapper>
