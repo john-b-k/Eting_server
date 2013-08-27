@@ -60,7 +60,7 @@ public class MainController {
 		List<StoryDTO> list = storyMapper.getStoryFromRecieved(et);
 		request.setAttribute("list", list);
 
-		List<StampDTO> stampList = storyMapper.getStamp();
+		List<StampDTO> stampList = storyMapper.getStamp(null);
 		request.setAttribute("stampList", stampList);
 
 		return "main";
@@ -145,6 +145,23 @@ public class MainController {
 		List<StampDTO> stampList = storyMapper.getStampByStory(storyId); // 스탬프찍기
 		model.addAttribute("stampList", stampList);
 
+		return jsonView;
+	}
+	
+	/**
+	 * 폰에서 스탬프 최고 번호를 수신하면
+	 * 서버에서 최고번호보다 최신 목록을 받아서
+	 * 응답으로 스탬프 목록을 내려준다 
+	 */
+	@RequestMapping(value = "/checkStamp")
+	public View checkStamp(HttpServletRequest request, Model model){
+		String stampId = request.getParameter("stampId");	//폰에서 받아온 스탬프아이디 최대값
+		
+		StampDTO stampDto = new StampDTO();
+		stampDto.setStamp_id(stampId);
+		List<StampDTO> stampList = storyMapper.getStamp(stampDto); // 폰보다 최신인 스탬프목록을 받아옴
+		model.addAttribute("stampList", stampList);	//모델에 박아서 넘김
+		
 		return jsonView;
 	}
 

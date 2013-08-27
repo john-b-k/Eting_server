@@ -10,7 +10,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			  ,content
 			  ,phone_id
 			  ,story_date
-		FROM lifenjoys.gif_story_story_master
+		FROM gif_story_story_master
 		WHERE phone_id = #{phone_id}
 		ORDER by story_date desc
 		 -->
@@ -22,10 +22,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		  ,phone_id
 		  ,story_date
 		  ,gif_story_stamp_master.stamp_name
-		FROM lifenjoys.gif_story_story_master
-	    LEFT OUTER JOIN lifenjoys.gif_story_story_stamp_mapping
+		FROM gif_story_story_master
+	    LEFT OUTER JOIN gif_story_story_stamp_mapping
 	    ON gif_story_story_master.story_id = gif_story_story_stamp_mapping.story_id
-	    LEFT OUTER JOIN lifenjoys.gif_story_stamp_master
+	    LEFT OUTER JOIN gif_story_stamp_master
 	    ON gif_story_story_stamp_mapping.stamp_id = gif_story_stamp_master.stamp_id    
 		WHERE phone_id = #{phone_id}
 		ORDER by story_date desc
@@ -34,14 +34,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<insert id="insStory" parameterType="storyDTO"
 	useGeneratedKeys="true" keyProperty="story_id">
 	INSERT INTO
-	lifenjoys.gif_story_story_master
+	gif_story_story_master
 		(content, phone_id, story_date)
 	VALUES
 		(#{content}, #{phone_id}, curdate())
 	</insert>
 
 	<update id="updStory" parameterType="storyDTO">
-		UPDATE lifenjoys.gif_story_story_master 
+		UPDATE gif_story_story_master 
 		<set>
 			<if test="exp_type != null">content= #{content},</if>
 		</set>
@@ -49,13 +49,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</update>
 
 	<delete id="delStory" parameterType="storyDTO">
-		DELETE FROM lifenjoys.gif_story_story_master
+		DELETE FROM gif_story_story_master
 		WHERE story_id = #{story_id}
 	</delete>
 	
 	<!-- 이야기 대기열에 이야기를 넣는다 -->
 	<insert id="insStoryQueue" parameterType="storyDTO">
-	INSERT INTO lifenjoys.gif_story_story_queue
+	INSERT INTO gif_story_story_queue
 		(story_id, phone_id) 
 	VALUES 
 		(#{story_id}, #{phone_id})
@@ -67,7 +67,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			  story_id
 			  ,content
 			  ,story_date
-		FROM lifenjoys.gif_story_story_queue
+		FROM gif_story_story_queue
 		NATURAL JOIN gif_story_story_master
 		WHERE phone_id != #{phone_id}
 		LIMIT 1
@@ -75,13 +75,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	
 	<!-- 대기열에서 받아온 이야기를 대기열에서 지우기 -->
 	<delete id="delStoryFromQueue" parameterType="storyDTO">
-		DELETE FROM lifenjoys.gif_story_story_queue
+		DELETE FROM gif_story_story_queue
 		WHERE story_id = #{story_id}
 	</delete>
 	
 	<!-- 받은이야기함에 넣는다. -->
 	<insert id="insRecievedStory" parameterType="storyDTO">
-	INSERT INTO lifenjoys.gif_story_recieved_story
+	INSERT INTO gif_story_recieved_story
 		(story_id, phone_id) 
 	VALUES 
 		(#{story_id}, #{phone_id})
@@ -93,7 +93,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			gif_story_recieved_story.story_id, 
 			gif_story_story_master.content, 
 			gif_story_story_master.story_date 
-		FROM lifenjoys.gif_story_recieved_story INNER JOIN lifenjoys.gif_story_story_master 
+		FROM gif_story_recieved_story INNER JOIN gif_story_story_master 
 		ON  gif_story_recieved_story.story_id = gif_story_story_master.story_id  
 		WHERE gif_story_recieved_story.phone_id = #{phone_id}
 		ORDER BY gif_story_recieved_story.story_id desc
@@ -101,17 +101,25 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</select>
 	
 	<!-- 스탬프 불러오기 -->
-	<select id="getStamp" resultType="stampDTO">	
+	<select id="getStamp" parameterType="String" resultType="stampDTO">	
 		SELECT 
 			stamp_id
 			,stamp_name
-		FROM lifenjoys.gif_story_stamp_master
+			,stamp_url
+			,stamp_type
+			,stamp_order
+		FROM gif_story_stamp_master
+		<if test="stamp_id != null">
+			<![CDATA[
+			WHERE stamp_id > #{stamp_id}
+			]]>
+		</if>
 	</select>
 	
 	<!-- 스탬프저장 -->
 	<insert id="insStampToStory" parameterType="stampDTO">
 	INSERT INTO
-	lifenjoys.gif_story_story_stamp_mapping
+	gif_story_story_stamp_mapping
 		(story_id, stamp_id)
 	VALUES
 		(#{story_id}, #{stamp_id})
@@ -119,7 +127,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	
 	<!-- 스탬프찍은 이야기를 받은이야기함에서 지우기 -->
 	<delete id="delStoryFromRecieved" parameterType="stampDTO">
-		DELETE FROM lifenjoys.gif_story_recieved_story
+		DELETE FROM gif_story_recieved_story
 		WHERE story_id = #{story_id}
 	</delete>
 
@@ -128,8 +136,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		SELECT
 			gif_story_story_stamp_mapping.stamp_id
 			,gif_story_stamp_master.stamp_name
-		FROM lifenjoys.gif_story_story_stamp_mapping
-		LEFT OUTER JOIN lifenjoys.gif_story_stamp_master
+		FROM gif_story_story_stamp_mapping
+		LEFT OUTER JOIN gif_story_stamp_master
 		ON gif_story_story_stamp_mapping.stamp_id =
 			gif_story_stamp_master.stamp_id
 		WHERE gif_story_story_stamp_mapping.story_id = #{story_id}

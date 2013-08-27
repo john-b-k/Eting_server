@@ -60,7 +60,7 @@ public interface StoryMapper {
 	/*
 	 * 사용가능한 스탬프 불러오기
 	 */
-	public List<StampDTO> getStamp();
+	public List<StampDTO> getStamp(StampDTO stampDto);
 
 	/*
 	 * 스탬프찍기

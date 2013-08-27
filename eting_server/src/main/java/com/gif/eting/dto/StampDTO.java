@@ -9,6 +9,24 @@ public class StampDTO {
 	private String stamp_id;
 	private String stamp_name;
 	private String stamp_url;
+	private String stamp_type;
+	private String stamp_order;
+
+	public String getStamp_type() {
+		return stamp_type;
+	}
+
+	public void setStamp_type(String stamp_type) {
+		this.stamp_type = stamp_type;
+	}
+
+	public String getStamp_order() {
+		return stamp_order;
+	}
+
+	public void setStamp_order(String stamp_order) {
+		this.stamp_order = stamp_order;
+	}
 
 	public String getStory_id() {
 		return story_id;
