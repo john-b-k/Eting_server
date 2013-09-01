@@ -9,7 +9,7 @@ import com.gif.eting.dto.StampDTO;
 import com.gif.eting.dto.StoryDTO;
 
 public interface StoryMapper {
-	@Select("SELECT * FROM gif_story_story_master WHERE story_id = #{story_id}")
+	@Select("SELECT * FROM story_master WHERE story_id = #{story_id}")
 	public StoryDTO getStory(@Param("story_id") String storyId);
 
 	/*
@@ -76,5 +76,10 @@ public interface StoryMapper {
 	 * 이야기ID를 갖고 스탬프 불러오기
 	 */
 	public List<StampDTO> getStampByStory(String storyId);
-
+	
+	/*
+	 * 이야기ID를 갖고 스탬프 불러오기
+	 */
+	public List<String> getStampedStoryByPhoneId(String storyId);
+	
 }

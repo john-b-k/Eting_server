@@ -129,18 +129,38 @@ public class MainController {
 	// 스탬프찍기
 	// 스탬프 찍고난 후 해당 스토리를 받은이야기함에서 지우기
 	@RequestMapping(value = "/saveStamp")
-	public View saveStamp(StampDTO et) {
+	public View saveStamp(HttpServletRequest request) {
+		//해당 이야기 고유번호
+		String storyId =  request.getParameter("story_id");
+		//보내는이
+		String sender = request.getParameter("sender");
+		//받아온 스탬프들
+		String stampsParam = request.getParameter("stamp_id");
+		String[] stamps = stampsParam.split(",");
+		//반복문 돌면서 저장
+		for(String stampId : stamps){
+			StampDTO stamp = new StampDTO();
+			stamp.setStamp_id(stampId);
+			stamp.setStory_id(storyId);
+			stamp.setSender(sender);
+			storyMapper.insStampToStory(stamp); // 스탬프찍기
+		}
 
-		storyMapper.insStampToStory(et); // 스탬프찍기
-		storyMapper.delStoryFromRecieved(et); // 스탬프찍은 이야기를 받음이야기함에서 지우기
+		//스탬프찍은 이야기를 작성한 사람에게 알림을 보낸다
+		//
 
+		// 스탬프찍은 이야기를 받음이야기함에서 지우기
+		StampDTO stampedStory = new StampDTO();
+		stampedStory.setStory_id(storyId);
+		storyMapper.delStoryFromRecieved(stampedStory);
+		
 		return jsonView;
 	}
 
 	// 스탬프 정보 폰에 전송
 	@RequestMapping(value = "/getStamp")
 	public View getStamp(HttpServletRequest request, Model model) {
-		String storyId = request.getParameter("storyId");
+		String storyId = request.getParameter("story_id");
 
 		List<StampDTO> stampList = storyMapper.getStampByStory(storyId); // 스탬프찍기
 		model.addAttribute("stampList", stampList);
@@ -155,12 +175,28 @@ public class MainController {
 	 */
 	@RequestMapping(value = "/checkStamp")
 	public View checkStamp(HttpServletRequest request, Model model){
-		String stampId = request.getParameter("stampId");	//폰에서 받아온 스탬프아이디 최대값
+		String stampId = request.getParameter("stamp_id");	//폰에서 받아온 스탬프아이디 최대값
 		
 		StampDTO stampDto = new StampDTO();
 		stampDto.setStamp_id(stampId);
 		List<StampDTO> stampList = storyMapper.getStamp(stampDto); // 폰보다 최신인 스탬프목록을 받아옴
 		model.addAttribute("stampList", stampList);	//모델에 박아서 넘김
+		
+		return jsonView;
+	}
+	
+	/**
+	 * 스탬프가 찍힌 이야기를 받아온다.
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/checkMyStoryStamped")
+	public View checkMyStoryStamped(HttpServletRequest request, Model model){
+		String phoneId = request.getParameter("phone_id");	//폰 아이디
+		
+		List<String> stampedStoryList = storyMapper.getStampedStoryByPhoneId(phoneId); // 스탬프가 찍힌 스토리 목록을 가져옴
+		model.addAttribute("stampedStoryList", stampedStoryList);	//모델에 박아서 넘김
 		
 		return jsonView;
 	}

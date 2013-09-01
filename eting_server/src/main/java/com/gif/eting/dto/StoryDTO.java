@@ -9,7 +9,16 @@ public class StoryDTO {
 	private String content;
 	private String phone_id;
 	private String story_date;
+	private String story_time;
 	private String stamp_name;
+
+	public String getStory_time() {
+		return story_time;
+	}
+
+	public void setStory_time(String story_time) {
+		this.story_time = story_time;
+	}
 
 	public String getStamp_name() {
 		return stamp_name;

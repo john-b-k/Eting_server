@@ -11,6 +11,15 @@ public class StampDTO {
 	private String stamp_url;
 	private String stamp_type;
 	private String stamp_order;
+	private String sender;
+
+	public String getSender() {
+		return sender;
+	}
+
+	public void setSender(String sender) {
+		this.sender = sender;
+	}
 
 	public String getStamp_type() {
 		return stamp_type;
