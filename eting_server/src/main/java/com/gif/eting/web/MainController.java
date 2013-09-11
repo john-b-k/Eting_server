@@ -1,6 +1,8 @@
 package com.gif.eting.web;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -16,8 +18,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.View;
 
 import com.gif.eting.dao.StoryMapper;
+import com.gif.eting.dto.PhoneDTO;
 import com.gif.eting.dto.StampDTO;
 import com.gif.eting.dto.StoryDTO;
+import com.gif.eting.util.HttpUtil;
 
 @Controller
 public class MainController {
@@ -69,7 +73,12 @@ public class MainController {
 	// 이야기 입력 화면
 	@RequestMapping(value = "/write")
 	public String input() {
-
+		HttpUtil http = new HttpUtil();
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("registration_id", "APA91bHnfiYpQyMBzPZl8zeUfwcu-49WRCgwC8289F7cTUHG61BySNIzSpzv--Z3kL3cwAEYNDKURttylh51mb14tBIlYTmA40iW0gdR41t74ogECZyQHYNVz2x5U8_iU_-OoC-weYY5wm_LguKiyuO-8MDgoV5znA");
+		String response = http.doGcm("https://android.googleapis.com/gcm/send", map);
+		System.out.println(response);
+		
 		return "write";
 	}
 
@@ -147,7 +156,13 @@ public class MainController {
 		}
 
 		//스탬프찍은 이야기를 작성한 사람에게 알림을 보낸다
-		//
+		String regId = storyMapper.getPhoneRegistration(storyId);
+		HttpUtil http = new HttpUtil();
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("registration_id", regId);
+		map.put("data.story_id", storyId);
+		String response = http.doGcm("https://android.googleapis.com/gcm/send", map);
+		log.debug("GCM = "+response);
 
 		// 스탬프찍은 이야기를 받음이야기함에서 지우기
 		StampDTO stampedStory = new StampDTO();
@@ -197,6 +212,26 @@ public class MainController {
 		
 		List<String> stampedStoryList = storyMapper.getStampedStoryByPhoneId(phoneId); // 스탬프가 찍힌 스토리 목록을 가져옴
 		model.addAttribute("stampedStoryList", stampedStoryList);	//모델에 박아서 넘김
+		
+		return jsonView;
+	}
+	
+	/**
+	 * 핸드폰 고유번호를 저장한다.
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/registration")
+	public View registration(HttpServletRequest request, Model model){
+		String phoneId = request.getParameter("phone_id");	//폰 아이디
+		String regId = request.getParameter("reg_id");	//GCM에서 사용할 고유번호
+		
+		PhoneDTO phoneDto = new PhoneDTO();
+		phoneDto.setPhone_id(phoneId);
+		phoneDto.setReg_id(regId);
+		int rtn = storyMapper.insPhoneRegistration(phoneDto);
+		model.addAttribute("result", rtn);
 		
 		return jsonView;
 	}

@@ -158,4 +158,25 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			story_master.story_id
 		WHERE story_master.phone_id = #{phone_id}		
 	</select>
+	
+	<!-- 폰 고유번호 저장 -->
+	<insert id="insPhoneRegistration" parameterType="phoneDto">
+		INSERT INTO
+		phone_registration
+			(phone_id, reg_id)
+		VALUES
+			(#{phone_id}, #{reg_id})
+	</insert>
+	
+	<!-- 폰 고유번호 불러오기 -->
+	<select id="getPhoneRegistration" parameterType="String" resultType="String">
+		SELECT
+		  reg_id
+		FROM
+		  phone_registration
+		  natural join story_master
+		WHERE
+		  story_id=#{story_id} 		
+	</select>
+	
 </mapper>

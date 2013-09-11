@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
+import com.gif.eting.dto.PhoneDTO;
 import com.gif.eting.dto.StampDTO;
 import com.gif.eting.dto.StoryDTO;
 
@@ -81,5 +82,16 @@ public interface StoryMapper {
 	 * 이야기ID를 갖고 스탬프 불러오기
 	 */
 	public List<String> getStampedStoryByPhoneId(String storyId);
+	
+	/*
+	 * 핸드폰 고유번호 저장
+	 */
+	public int insPhoneRegistration(PhoneDTO phoneDto);
+	
+	/*
+	 * 핸드폰 고유번호 불러오기
+	 * @param story_id
+	 */
+	public String getPhoneRegistration(String story_id);
 	
 }

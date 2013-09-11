@@ -23,6 +23,7 @@
 	<typeAliases>
 		<typeAlias alias="storyDto" type="com.gif.eting.dto.StoryDTO" />
 		<typeAlias alias="stampDto" type="com.gif.eting.dto.StampDTO" />
+		<typeAlias alias="phoneDto" type="com.gif.eting.dto.PhoneDTO" />
 
 	</typeAliases>
 </configuration>
