@@ -135,8 +135,12 @@ public class MainController {
 		request.setAttribute("list", list);
 	}
 
-	// 스탬프찍기
-	// 스탬프 찍고난 후 해당 스토리를 받은이야기함에서 지우기
+	/**
+	 *  스탬프찍기
+	 *  스탬프 찍고난 후 해당 스토리를 받은이야기함에서 지우기
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping(value = "/saveStamp")
 	public View saveStamp(HttpServletRequest request) {
 		//해당 이야기 고유번호
@@ -172,7 +176,12 @@ public class MainController {
 		return jsonView;
 	}
 
-	// 스탬프 정보 폰에 전송
+	/**
+	 *  스탬프 정보 폰에 전송
+	 * @param request
+	 * @param model
+	 * @return
+	 */
 	@RequestMapping(value = "/getStamp")
 	public View getStamp(HttpServletRequest request, Model model) {
 		String storyId = request.getParameter("story_id");
@@ -231,6 +240,25 @@ public class MainController {
 		phoneDto.setPhone_id(phoneId);
 		phoneDto.setReg_id(regId);
 		int rtn = storyMapper.insPhoneRegistration(phoneDto);
+		model.addAttribute("result", rtn);
+		
+		return jsonView;
+	}
+	
+	/**
+	 * 신고기능
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/report")
+	public View reportEting(HttpServletRequest request, Model model){
+		String storyId = request.getParameter("story_id");	//신고할 이야기 번호
+		
+		StoryDTO storyDto = new StoryDTO();
+		storyDto.setStory_id(storyId);
+		
+		int rtn = storyMapper.insStoryReport(storyDto);
 		model.addAttribute("result", rtn);
 		
 		return jsonView;

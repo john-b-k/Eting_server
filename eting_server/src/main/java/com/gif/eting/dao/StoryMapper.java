@@ -92,6 +92,12 @@ public interface StoryMapper {
 	 * 핸드폰 고유번호 불러오기
 	 * @param story_id
 	 */
-	public String getPhoneRegistration(String story_id);
+	public String getPhoneRegistration(String story_id);	
+
+	/*
+	 * 신고등록
+	 */
+	public int insStoryReport(StoryDTO storyDto);
+
 	
 }
