@@ -12,7 +12,7 @@
 
 	<!-- Application Loggers -->
 	<logger name="com.gif.eting">
-		<level value="debug" />
+		<level value="info" />
 	</logger>
 
 	<!-- 3rdparty Loggers -->
@@ -38,7 +38,7 @@
 
 	<!-- Root Logger -->
 	<root>
-		<priority value="debug" />
+		<priority value="info" />
 		<appender-ref ref="console" />
 	</root>
 

@@ -12,6 +12,35 @@ public class StoryDTO {
 	private String story_time;
 	private String stamp_name;
 
+	
+	
+	@Override
+	public String toString() {
+		StringBuffer sb = new StringBuffer();
+		
+		sb.append("story_id=");
+		sb.append(story_id);
+		sb.append("|");
+		
+		sb.append("content=");
+		sb.append(content);
+		sb.append("|");
+		
+		sb.append("phone_id=");
+		sb.append(phone_id);
+		sb.append("|");
+		
+		sb.append("story_date=");
+		sb.append(story_date);
+		sb.append("|");
+		
+		sb.append("story_time=");
+		sb.append(story_time);
+		sb.append("|");
+		
+		return sb.toString();
+	}
+
 	public String getStory_time() {
 		return story_time;
 	}

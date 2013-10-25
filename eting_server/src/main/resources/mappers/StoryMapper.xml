@@ -128,9 +128,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<insert id="insStampToStory" parameterType="stampDTO">
 	INSERT INTO
 	story_stamp_mapping
-		(story_id, stamp_id, sender)
+		(story_id, stamps, story_comment)
 	VALUES
-		(#{story_id}, #{stamp_id}, #{sender})
+		(#{story_id}, #{stamps}, #{comment})
 	</insert>
 	
 	<!-- 스탬프찍은 이야기를 받은이야기함에서 지우기 -->

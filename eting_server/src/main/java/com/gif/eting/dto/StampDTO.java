@@ -11,14 +11,44 @@ public class StampDTO {
 	private String stamp_url;
 	private String stamp_type;
 	private String stamp_order;
-	private String sender;
+	private String comment;
+	private String stamps;
+	
+	
 
-	public String getSender() {
-		return sender;
+	@Override
+	public String toString() {
+		StringBuffer sb = new StringBuffer();
+		
+		sb.append("story_id=");
+		sb.append(story_id);
+		sb.append("|");
+				
+		sb.append("stamps=");
+		sb.append(stamps);
+		sb.append("|");
+				
+		sb.append("comment=");
+		sb.append(comment);
+		sb.append("|");
+			
+		return sb.toString();
 	}
 
-	public void setSender(String sender) {
-		this.sender = sender;
+	public String getStamps() {
+		return stamps;
+	}
+
+	public void setStamps(String stamps) {
+		this.stamps = stamps;
+	}
+
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
 	}
 
 	public String getStamp_type() {

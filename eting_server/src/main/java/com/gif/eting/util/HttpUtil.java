@@ -18,12 +18,16 @@ import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * HTTP통신 유틸 한글문제 해결
  */
 public class HttpUtil {
+	Logger log = LoggerFactory.getLogger(HttpUtil.class);
+	
 	/**
 	 * POST 요청
 	 * 
@@ -40,7 +44,7 @@ public class HttpUtil {
 
 		try {
 			HttpPost post = new HttpPost(url);
-			System.out.println("POST : " + post.getURI());
+			log.debug("POST : " + post.getURI());
 
 			List<NameValuePair> paramList = convertParam(params);
 			post.setEntity(new UrlEncodedFormEntity(paramList, encoding));
@@ -66,7 +70,7 @@ public class HttpUtil {
 
 		try {
 			HttpPost post = new HttpPost(url);			
-			System.out.println("POST : " + post.getURI());
+			log.debug("POST : " + post.getURI());
 			
 			/**
 			 * 헤더설정
@@ -79,7 +83,7 @@ public class HttpUtil {
 			
 			HttpResponse response = client.execute(post);
 			HttpEntity entity = response.getEntity();
-			System.out.println(EntityUtils.toString(entity));
+			log.debug(EntityUtils.toString(entity));
 			
 			return response.toString();
 		} catch (Exception e) {
@@ -101,7 +105,7 @@ public class HttpUtil {
 			List<NameValuePair> paramList = convertParam(params);
 			HttpGet get = new HttpGet(url + "?"
 					+ URLEncodedUtils.format(paramList, encoding));
-			System.out.println("GET : " + get.getURI());
+			log.debug("GET : " + get.getURI());
 
 			ResponseHandler<String> rh = new BasicResponseHandler();
 
