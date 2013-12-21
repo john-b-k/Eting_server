@@ -98,6 +98,11 @@ public interface StoryMapper {
 	 * 신고등록
 	 */
 	public int insStoryReport(StoryDTO storyDto);
+	
+	/*
+	 * 폰 전체 목록 가져오기
+	 */
+	public List<PhoneDTO> getPhoneRegistrationList();
 
 	
 }

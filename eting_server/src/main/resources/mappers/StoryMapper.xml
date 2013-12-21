@@ -194,5 +194,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			where story_id = #{story_id}))
 	</insert>
 	
+	<!-- 등록된 폰 전부 불러오기 -->
+	<select id="getPhoneRegistrationList" parameterType="String" resultType="phoneDto">
+		SELECT
+			phone_id
+			,reg_id
+		FROM
+		  phone_registration 		
+	</select>
+	
 	
 </mapper>

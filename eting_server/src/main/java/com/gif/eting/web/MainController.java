@@ -189,5 +189,59 @@ public class MainController {
 		
 		return jsonView;
 	}
+	
+	/**
+	 * 관리자 알림메세지 전송
+	 * 
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/sendAdminMsg")
+	public View sendAdminMsg(HttpServletRequest request, Model model){
+		//사용자에게 알림메세지를 보낸다
+		//TODO 보낼 사용자는 임시로 지정
+		String isTest = request.getParameter("isTest");
+		if("".equals(isTest)){
+			return null;
+		}
+		
+		String regId = "APA91bHVxAZTrmv-IHmRCIG9rPEMTuQqaL051CkK2EO8ujtqL2OOa_qprI16ZMTAOEy3p93qfbiYBlR7gC-knBGcPWc-mx8KRbBIHHbZaRfea5Fnv6mQkYhC6Hs5P6y0N30h0NE2TPd78rRD0Aj2YWAnQSYQ9CBSrQ";
+		String msgId = "2";
+		String content = "안녕하세요 저희는 eting을 만든 학생들입니다 :) \n\n"
+				+"다음 eting 업데이트를 앞두고, 업데이트 방향에 도움이 될 여러분들의 의견을 받고자 합니다. 바쁘시지만 1~2분 동안 시간내 주시길 부탁드려요 ! \n"
+				+"http://me2.do/xxE5hDdF \n"
+				+" \n"
+				+"eting을 사용해 주셔서 감사합니다 \n"
+				+"더욱더 발전하는 eting이 되겠습니다 \n"
+				+"오늘도 eting 하세요 :-)";
+		
+		List<PhoneDTO> phoneList = storyMapper.getPhoneRegistrationList();
+		
+		
+		HttpUtil http = new HttpUtil();
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("registration_id", regId);
+		map.put("data.msgId", msgId);
+		map.put("data.content", content);
+		map.put("data.isNoti", "Y");
+		String response = http.doGcm("https://android.googleapis.com/gcm/send", map);
+		log.debug("GCM sendAdminMsg = "+response);
+		
+		model.addAttribute("result", "Y");
+		
+		return jsonView;
+	}
+	
+	/**
+	 * 알림메세지에 대한 코멘트
+	 */
+	@RequestMapping(value = "/sendAdminMsgComment")
+	public View sendAdminMsgComment(HttpServletRequest request, Model model){
+		String msgId = request.getParameter("msgId");
+		String comment = request.getParameter("comment");
+		log.info("#msg comment = #\t"+msgId+" , "+comment);		
+		return jsonView;
+	}
 
 }
