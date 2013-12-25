@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gif.eting.dao.AdminMsgMapper">
+	<insert id="insAdminMsg" parameterType="adminMsg"
+	useGeneratedKeys="true" keyProperty="msg_id">
+	INSERT INTO
+	admin_msg
+		(msg_content, msg_date)
+	VALUES
+		(#{msg_content}, curdate())
+	</insert>
+	
+	<insert id="insAdminMsgComment" parameterType="adminMsg">
+	INSERT INTO
+	admin_msg_comment
+		(msg_id, msg_comment)
+	VALUES
+		(#{msg_id}, #{msg_comment})
+	</insert>
+</mapper>

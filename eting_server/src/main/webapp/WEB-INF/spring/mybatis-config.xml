@@ -24,6 +24,8 @@
 		<typeAlias alias="storyDto" type="com.gif.eting.dto.StoryDTO" />
 		<typeAlias alias="stampDto" type="com.gif.eting.dto.StampDTO" />
 		<typeAlias alias="phoneDto" type="com.gif.eting.dto.PhoneDTO" />
+		<typeAlias alias="user" type="com.gif.eting.dto.User" />
+		<typeAlias alias="adminMsg" type="com.gif.eting.dto.AdminMsg" />
 
 	</typeAliases>
 </configuration>

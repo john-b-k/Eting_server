@@ -200,7 +200,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			phone_id
 			,reg_id
 		FROM
-		  phone_registration 		
+		  phone_registration
 	</select>
 	
 	
