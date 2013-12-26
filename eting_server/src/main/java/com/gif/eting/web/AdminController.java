@@ -115,6 +115,12 @@ public class AdminController {
 		String msgId = request.getParameter("msgId");
 		String comment = request.getParameter("comment");
 		
+		try{
+			Integer.parseInt(msgId);
+		}catch(NumberFormatException e){
+			msgId = "1";
+		}
+		
 		AdminMsg msg = new AdminMsg();
 		msg.setMsg_id(msgId);
 		msg.setMsg_comment(comment);		

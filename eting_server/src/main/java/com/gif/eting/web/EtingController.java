@@ -196,12 +196,13 @@ public class EtingController {
 
 	/**
 	 *  랜덤으로 이야기 발송!!
+	 *  1분마다 발송한다.
 	 *  
 	 * @param request
 	 * @return
 	 */
-	//@Scheduled(cron="0 */10 * * * *")
-	@Scheduled(cron="*/10 * * * * *")
+	@Scheduled(cron="0 */1 * * * *")
+	//@Scheduled(cron="*/10 * * * * *")
 	@RequestMapping(value = "/sendInbox")
 	public void sendInbox() {
 		PhoneDTO phone = storyMapper.getRandomPhone();
