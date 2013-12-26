@@ -194,14 +194,55 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			where story_id = #{story_id}))
 	</insert>
 	
-	<!-- 등록된 폰 전부 불러오기 -->
+	<!-- 등록된 폰 정보 불러오기 -->
+	<!-- 실제 사용한 일수가 3일 이상인 사람만 가져온다. -->
 	<select id="getPhoneRegistrationList" parameterType="String" resultType="phoneDto">
 		SELECT
 			phone_id
 			,reg_id
 		FROM
 		  phone_registration
+		WHERE
+		 phone_id in (
+		select phone_id from story_master
+		where story_date &gt; STR_TO_DATE('2013-11-01',get_format(date,'iso'))
+		group by phone_id
+		having count(distinct story_date) &gt; 2)
 	</select>
 	
+	<!-- 무작위로 이야기를 불러온다. -->
+	<select id="getRandomStory" resultType="storyDTO">	
+		SELECT
+			story_id
+			,content
+			,story_date
+			,story_time
+		FROM story_master
+		WHERE phone_id != #{phone_id}
+		AND phone_id not in (select phone_id  
+									from story_report 
+									group by phone_id 
+									having count(phone_id) >= 3)
+		ORDER by rand()
+		LIMIT 1
+	</select>
+	
+	<!-- 랜덤하게 폰 하나 가져오기 -->
+	<!-- 실제 사용한 일수가 3일 이상인 사람만 가져온다. -->
+	<select id="getRandomPhone" resultType="phoneDto">
+		SELECT
+			phone_id
+			,reg_id
+		FROM
+		  phone_registration
+		WHERE
+		 phone_id in (
+		select phone_id from story_master
+		where story_date &gt; STR_TO_DATE('2013-11-01',get_format(date,'iso'))
+		group by phone_id
+		having count(distinct story_date) &gt; 2)
+		ORDER by rand()
+		LIMIT 1
+	</select>
 	
 </mapper>

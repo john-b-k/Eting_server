@@ -104,5 +104,14 @@ public interface StoryMapper {
 	 */
 	public List<PhoneDTO> getPhoneRegistrationList();
 
+	/*
+	 * 무작위 이야기를 불러온다
+	 */
+	public StoryDTO getRandomStory(String phoneId);
+	
+	/*
+	 * 무작위로 이용자 한명을 선택한다.
+	 */
+	public PhoneDTO getRandomPhone();
 	
 }

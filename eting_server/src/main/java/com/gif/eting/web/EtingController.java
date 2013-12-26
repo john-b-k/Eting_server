@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -102,6 +103,7 @@ public class EtingController {
 		HttpUtil http = new HttpUtil();
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("registration_id", regId);
+		map.put("data.type", "Stamp");
 		map.put("data.story_id", storyId);
 		map.put("data.stamps", stampsParam);
 		map.put("data.comment", comment);
@@ -188,6 +190,45 @@ public class EtingController {
 		model.addAttribute("result", rtn);
 		
 		return jsonView;
+	}
+	
+
+
+	/**
+	 *  랜덤으로 이야기 발송!!
+	 *  
+	 * @param request
+	 * @return
+	 */
+	//@Scheduled(cron="0 */10 * * * *")
+	@Scheduled(cron="*/10 * * * * *")
+	@RequestMapping(value = "/sendInbox")
+	public void sendInbox() {
+		PhoneDTO phone = storyMapper.getRandomPhone();
+		String phoneId = phone.getPhone_id();			
+		StoryDTO recievedStory = storyMapper.getRandomStory(phoneId); // 무작위로 이야기를 가져온다.
+		
+		String storyId = recievedStory.getStory_id();
+		String content = recievedStory.getContent();
+		String storyDate = recievedStory.getStory_date();
+		String storyTime = recievedStory.getStory_time();
+	
+		String regId = phone.getReg_id();
+		HttpUtil http = new HttpUtil();
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("registration_id", regId);
+		map.put("data.type", "Inbox");
+		map.put("data.story_id", storyId);
+		map.put("data.content", content);
+		map.put("data.story_date", storyDate);
+		map.put("data.story_time", storyTime);
+		String response = http.doGcm("https://android.googleapis.com/gcm/send", map);
+		
+		log.info("");
+		log.info("to = "+phoneId);
+		log.info("story_id = "+storyId);
+		log.info("GCM = "+response);
+		
 	}
 
 }

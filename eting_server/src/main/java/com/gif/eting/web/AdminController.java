@@ -67,8 +67,8 @@ public class AdminController {
 		msg.setMsg_content(msgContent);
 		
 		//관리자메세지 저장
-		int msg_id = adminMsgMapper.insAdminMsg(msg);
-		String msgId = String.valueOf(msg_id);
+		adminMsgMapper.insAdminMsg(msg);
+		String msgId = msg.getMsg_id();
 		
 		//테스트구분
 		if("Y".equals(isTest)){
@@ -77,6 +77,7 @@ public class AdminController {
 			HttpUtil http = new HttpUtil();
 			Map<String, String> map = new HashMap<String, String>();
 			map.put("registration_id", regId);
+			map.put("data.type", "Admin");
 			map.put("data.msgId", msgId);
 			map.put("data.content", msgContent);
 			map.put("data.isNoti", isNoti);
