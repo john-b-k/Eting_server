@@ -167,15 +167,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<insert id="insPhoneRegistration" parameterType="phoneDto">
 		INSERT INTO
 		phone_registration
-			(phone_id, reg_id)
+			(phone_id, reg_id, os, reg_date)
 		VALUES
-			(#{phone_id}, #{reg_id})
+			(#{phone_id}, #{reg_id}, #{os}, curdate())
 	</insert>
 	
 	<!-- 폰 고유번호 불러오기 -->
-	<select id="getPhoneRegistration" parameterType="String" resultType="String">
+	<select id="getPhoneRegistration" parameterType="String" resultType="phoneDto">
 		SELECT
 		  reg_id
+		  ,os
 		FROM
 		  phone_registration
 		  natural join story_master
@@ -222,7 +223,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		AND phone_id not in (select phone_id  
 									from story_report 
 									group by phone_id 
-									having count(phone_id) >= 3)
+									having count(phone_id) &gt;= 3)
+		AND DATE_SUB(CURDATE(),INTERVAL 30 DAY) &lt;= story_date
 		ORDER by rand()
 		LIMIT 1
 	</select>
@@ -233,6 +235,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		SELECT
 			phone_id
 			,reg_id
+			,os
+			,reg_date
 		FROM
 		  phone_registration
 		WHERE

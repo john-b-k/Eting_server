@@ -94,6 +94,7 @@ public class AdminController {
 			HttpUtil http = new HttpUtil();
 			Map<String, String> map = new HashMap<String, String>();
 			map.put("registration_id", regId);
+			map.put("data.type", "Admin");
 			map.put("data.msgId", msgId);
 			map.put("data.content", msgContent);
 			map.put("data.isNoti", isNoti);

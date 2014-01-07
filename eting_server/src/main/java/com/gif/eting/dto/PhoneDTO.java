@@ -6,6 +6,7 @@ import java.util.Date;
 public class PhoneDTO {
 	private String phone_id;
 	private String reg_id;
+	private String os;
 	
 	
 	@Override
@@ -54,5 +55,15 @@ public class PhoneDTO {
 	public void setReg_id(String reg_id) {
 		this.reg_id = reg_id;
 	}
+
+	public String getOs() {
+		return os;
+	}
+
+	public void setOs(String os) {
+		this.os = os;
+	}
+	
+	
 
 }

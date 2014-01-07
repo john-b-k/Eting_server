@@ -4,13 +4,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+
+import net.sf.json.JSONObject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -21,6 +23,7 @@ import com.gif.eting.dao.StoryMapper;
 import com.gif.eting.dto.PhoneDTO;
 import com.gif.eting.dto.StampDTO;
 import com.gif.eting.dto.StoryDTO;
+import com.gif.eting.util.ApnsHelper;
 import com.gif.eting.util.HttpUtil;
 
 @Controller
@@ -33,6 +36,9 @@ public class EtingController {
 
 	@Autowired
 	StoryMapper storyMapper;
+	
+	@Autowired
+	ServletContext context;
 
 	
 	// 이야기 저장하기
@@ -99,16 +105,36 @@ public class EtingController {
 		log.info("#stamp&comment#\t"+stamp.toString());
 
 		//스탬프찍은 이야기를 작성한 사람에게 알림을 보낸다
-		String regId = storyMapper.getPhoneRegistration(storyId);
-		HttpUtil http = new HttpUtil();
-		Map<String, String> map = new HashMap<String, String>();
-		map.put("registration_id", regId);
-		map.put("data.type", "Stamp");
-		map.put("data.story_id", storyId);
-		map.put("data.stamps", stampsParam);
-		map.put("data.comment", comment);
-		String response = http.doGcm("https://android.googleapis.com/gcm/send", map);
-		log.debug("GCM = "+response);
+		PhoneDTO phone = storyMapper.getPhoneRegistration(storyId);
+		
+		//폰정보가 없으면 그냥 리턴
+		if(phone== null){
+			return jsonView;
+		}
+		
+		String regId = phone.getReg_id();
+		String os = phone.getOs();
+		
+		if("A".equals(os)){
+			//안드로이드 GCM
+			HttpUtil http = new HttpUtil();
+			Map<String, String> map = new HashMap<String, String>();
+			map.put("registration_id", regId);
+			map.put("data.type", "Stamp");
+			map.put("data.story_id", storyId);
+			map.put("data.stamps", stampsParam);
+			map.put("data.comment", comment);
+			String response = http.doGcm("https://android.googleapis.com/gcm/send", map);
+			log.debug("GCM = "+response);	
+		}else if("I".equals(os)){
+			JSONObject obj = new JSONObject();
+			obj.put("type", "Stamp");
+			obj.put("story_id", storyId);
+			obj.put("stamps", stampsParam);
+			obj.put("comment", comment);
+			
+			ApnsHelper.sendApns(context, regId, "reply", obj.toString(), "eting!!");
+		}		
 
 		// 스탬프찍은 이야기를 받음이야기함에서 지우기
 		StampDTO stampedStory = new StampDTO();
@@ -146,10 +172,15 @@ public class EtingController {
 	public View registration(HttpServletRequest request, Model model){
 		String phoneId = request.getParameter("phone_id");	//폰 아이디
 		String regId = request.getParameter("reg_id");	//GCM에서 사용할 고유번호
+		String os = request.getParameter("os");	//안드로이드, 아이폰 구분
+		if("".equals(os) || os == null){
+			os = "A";	//값이 없으면 안드로이드로 세팅 (하위버젼 호환성때문에)
+		}
 		
 		PhoneDTO phoneDto = new PhoneDTO();
 		phoneDto.setPhone_id(phoneId);
 		phoneDto.setReg_id(regId);
+		phoneDto.setOs(os);
 		
 		//접속기록남기기
 		log.info("#connection_log#\t"+phoneDto.toString());
@@ -201,12 +232,14 @@ public class EtingController {
 	 * @param request
 	 * @return
 	 */
-	@Scheduled(cron="0 */1 * * * *")
+	//@Scheduled(cron="0 */5 * * * *")
 	//@Scheduled(cron="*/10 * * * * *")
 	@RequestMapping(value = "/sendInbox")
 	public void sendInbox() {
 		PhoneDTO phone = storyMapper.getRandomPhone();
-		String phoneId = phone.getPhone_id();			
+		String phoneId = phone.getPhone_id();		
+		String os = phone.getOs();
+		
 		StoryDTO recievedStory = storyMapper.getRandomStory(phoneId); // 무작위로 이야기를 가져온다.
 		
 		String storyId = recievedStory.getStory_id();
@@ -215,15 +248,30 @@ public class EtingController {
 		String storyTime = recievedStory.getStory_time();
 	
 		String regId = phone.getReg_id();
-		HttpUtil http = new HttpUtil();
-		Map<String, String> map = new HashMap<String, String>();
-		map.put("registration_id", regId);
-		map.put("data.type", "Inbox");
-		map.put("data.story_id", storyId);
-		map.put("data.content", content);
-		map.put("data.story_date", storyDate);
-		map.put("data.story_time", storyTime);
-		String response = http.doGcm("https://android.googleapis.com/gcm/send", map);
+		String response = "";
+		
+		if("A".equals(os)){
+			HttpUtil http = new HttpUtil();
+			Map<String, String> map = new HashMap<String, String>();
+			map.put("registration_id", regId);
+			map.put("data.type", "Inbox");
+			map.put("data.story_id", storyId);
+			map.put("data.content", content);
+			map.put("data.story_date", storyDate);
+			map.put("data.story_time", storyTime);
+			response = http.doGcm("https://android.googleapis.com/gcm/send", map);	
+		}else if ("I".equals(os)){
+
+			JSONObject obj = new JSONObject();
+			obj.put("type", "Inbox");
+			obj.put("story_id", storyId);
+			obj.put("content", content);
+			obj.put("story_date", storyDate);
+			obj.put("story_time", storyTime);
+			
+			ApnsHelper.sendApns(context, regId, "inbox", obj.toString(), "eting!!");
+			response = "apns";
+		}
 		
 		log.info("");
 		log.info("to = "+phoneId);
