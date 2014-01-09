@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -109,6 +110,7 @@ public class EtingController {
 		
 		//폰정보가 없으면 그냥 리턴
 		if(phone== null){
+			log.info("#no phone id by storyId#\t"+storyId);
 			return jsonView;
 		}
 		
@@ -173,6 +175,7 @@ public class EtingController {
 		String phoneId = request.getParameter("phone_id");	//폰 아이디
 		String regId = request.getParameter("reg_id");	//GCM에서 사용할 고유번호
 		String os = request.getParameter("os");	//안드로이드, 아이폰 구분
+		
 		if("".equals(os) || os == null){
 			os = "A";	//값이 없으면 안드로이드로 세팅 (하위버젼 호환성때문에)
 		}
@@ -227,13 +230,12 @@ public class EtingController {
 
 	/**
 	 *  랜덤으로 이야기 발송!!
-	 *  1분마다 발송한다.
+	 *  5분마다 발송한다.
 	 *  
 	 * @param request
 	 * @return
 	 */
-	//@Scheduled(cron="0 */5 * * * *")
-	//@Scheduled(cron="*/10 * * * * *")
+	@Scheduled(cron="0 */5 * * * *")
 	@RequestMapping(value = "/sendInbox")
 	public void sendInbox() {
 		PhoneDTO phone = storyMapper.getRandomPhone();

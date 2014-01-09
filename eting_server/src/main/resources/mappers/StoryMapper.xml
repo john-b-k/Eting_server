@@ -212,19 +212,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</select>
 	
 	<!-- 무작위로 이야기를 불러온다. -->
-	<select id="getRandomStory" resultType="storyDTO">	
+	<select id="getRandomStory" resultType="storyDTO">
 		SELECT
-			story_id
-			,content
-			,story_date
-			,story_time
-		FROM story_master
-		WHERE phone_id != #{phone_id}
-		AND phone_id not in (select phone_id  
+			sm.story_id
+			,sm.content
+			,sm.story_date
+			,sm.story_time
+		FROM story_master sm
+		,recieved_story rs
+		WHERE sm.story_id = rs.story_id
+		AND sm.phone_id != #{phone_id}
+		AND sm.phone_id not in (select phone_id  
 									from story_report 
 									group by phone_id 
-									having count(phone_id) &gt;= 3)
-		AND DATE_SUB(CURDATE(),INTERVAL 30 DAY) &lt;= story_date
+									having count(phone_id) >= 3)
+		AND DATE_SUB(CURDATE(),INTERVAL 2 DAY) > story_date
 		ORDER by rand()
 		LIMIT 1
 	</select>
