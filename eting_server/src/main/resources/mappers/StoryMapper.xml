@@ -235,20 +235,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<!-- 실제 사용한 일수가 3일 이상인 사람만 가져온다. -->
 	<select id="getRandomPhone" resultType="phoneDto">
 		SELECT
-			phone_id
-			,reg_id
-			,os
-			,reg_date
+			pr.phone_id
+			,pr.reg_id
+			,pr.os
+			,pr.reg_date
 		FROM
-		  phone_registration
-		WHERE
-		 phone_id in (
+		  phone_registration pr
+		  ,(
 		select phone_id from story_master
-		where story_date &gt; STR_TO_DATE('2013-11-01',get_format(date,'iso'))
+		where story_date > STR_TO_DATE('2013-11-01',get_format(date,'iso'))
 		group by phone_id
-		having count(distinct story_date) &gt; 2)
+		having count(distinct story_date) > 2
 		ORDER by rand()
 		LIMIT 1
+		) p
+		WHERE pr.phone_id = p.phone_id
 	</select>
 	
 </mapper>
