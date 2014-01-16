@@ -128,9 +128,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<insert id="insStampToStory" parameterType="stampDTO">
 	INSERT INTO
 	story_stamp_mapping
-		(story_id, stamps, story_comment)
+		(story_id, phone_id, stamps, story_comment)
 	VALUES
-		(#{story_id}, #{stamps}, #{comment})
+		(#{story_id},#{phone_id}, #{stamps}, #{comment})
 	</insert>
 	
 	<!-- 스탬프찍은 이야기를 받은이야기함에서 지우기 -->
@@ -199,18 +199,34 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<!-- 실제 사용한 일수가 3일 이상인 사람만 가져온다. -->
 	<select id="getPhoneRegistrationList" parameterType="String" resultType="phoneDto">
 		SELECT
+			pr.phone_id
+			,pr.reg_id
+			,pr.os
+			,pr.reg_date
+		FROM
+		  phone_registration pr
+		  ,(
+		select phone_id from story_master
+		where story_date > STR_TO_DATE('2013-11-01',get_format(date,'iso'))
+		group by phone_id
+		having count(distinct story_date) > 2
+		) p
+		WHERE pr.phone_id = p.phone_id
+	</select>
+
+	<!-- 가입한지 3일 이내인 사람만!!! -->	 
+	
+	<!-- 
+	<select id="getPhoneRegistrationList" parameterType="String" resultType="phoneDto">
+		SELECT
 			phone_id
 			,reg_id
 		FROM
-		  phone_registration
-		WHERE
-		 phone_id in (
-		select phone_id from story_master
-		where story_date &gt; STR_TO_DATE('2013-11-01',get_format(date,'iso'))
-		group by phone_id
-		having count(distinct story_date) &gt; 2)
+			phone_registration
 	</select>
 	
+	 -->
+	 
 	<!-- 무작위로 이야기를 불러온다. -->
 	<select id="getRandomStory" resultType="storyDTO">
 		SELECT
@@ -226,7 +242,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 									from story_report 
 									group by phone_id 
 									having count(phone_id) >= 3)
-		AND DATE_SUB(CURDATE(),INTERVAL 2 DAY) > story_date
+		AND DATE_SUB(CURDATE(),INTERVAL 1 DAY) > story_date
 		ORDER by rand()
 		LIMIT 1
 	</select>
@@ -248,6 +264,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		having count(distinct story_date) > 2
 		ORDER by rand()
 		LIMIT 1
+		) p
+		WHERE pr.phone_id = p.phone_id
+	</select>
+	
+	<!-- 실제 사용한 일수가 3일 이상인 사람 숫자만 가져온다. -->
+	<select id="getPhoneRegistrationCnt" resultType="java.lang.Integer">
+		SELECT
+			count(*)
+		FROM
+		  phone_registration pr
+		  ,(
+		select phone_id from story_master
+		where story_date > STR_TO_DATE('2013-11-01',get_format(date,'iso'))
+		group by phone_id
+		having count(distinct story_date) > 2
 		) p
 		WHERE pr.phone_id = p.phone_id
 	</select>

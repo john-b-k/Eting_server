@@ -92,12 +92,15 @@ public class EtingController {
 	public View saveStamp(HttpServletRequest request) {
 		//해당 이야기 고유번호
 		String storyId =  request.getParameter("story_id");
+		//해당 기기 고유번호
+		String phoneId =  request.getParameter("phone_id");
 		//보내는이
 		String comment = request.getParameter("sender");
 		//받아온 스탬프들
 		String stampsParam = request.getParameter("stamp_id");
 		StampDTO stamp = new StampDTO();
 		stamp.setStory_id(storyId);
+		stamp.setPhone_id(phoneId);
 		stamp.setStamps(stampsParam);
 		stamp.setComment(comment);
 		storyMapper.insStampToStory(stamp); // 스탬프찍기
@@ -186,7 +189,7 @@ public class EtingController {
 		phoneDto.setOs(os);
 		
 		//접속기록남기기
-		log.info("#connection_log#\t"+phoneDto.toString());
+		log.warn("#connection_log#\t"+phoneDto.toString());
 		
 		try{
 			int rtn = storyMapper.insPhoneRegistration(phoneDto);
@@ -225,61 +228,93 @@ public class EtingController {
 		
 		return jsonView;
 	}
+
+	/**
+	 * 답장하기 애매한 이야기를 패스한다.
+	 */
+	@RequestMapping(value = "/passStory")
+	public View passStory(HttpServletRequest request, Model model){
+		String storyId = request.getParameter("story_id");	//신고할 이야기 번호
+		
+		StoryDTO storyDto = new StoryDTO();
+		storyDto.setStory_id(storyId);
+		
+		//넘긴 이야기
+		log.info("#passed_story#\t"+storyId);		
+		
+		storyMapper.insRecievedStory(storyDto);
+		storyMapper.insStoryQueue(storyDto);
+		model.addAttribute("result", "success");
+		
+		return jsonView;
+	}
+	
 	
 
 
 	/**
 	 *  랜덤으로 이야기 발송!!
-	 *  5분마다 발송한다.
+	 *  10분마다 발송한다.
 	 *  
 	 * @param request
 	 * @return
 	 */
-	@Scheduled(cron="0 */5 * * * *")
+	@Scheduled(cron="0 */7 * * * *")
 	@RequestMapping(value = "/sendInbox")
 	public void sendInbox() {
-		PhoneDTO phone = storyMapper.getRandomPhone();
-		String phoneId = phone.getPhone_id();		
-		String os = phone.getOs();
-		
-		StoryDTO recievedStory = storyMapper.getRandomStory(phoneId); // 무작위로 이야기를 가져온다.
-		
-		String storyId = recievedStory.getStory_id();
-		String content = recievedStory.getContent();
-		String storyDate = recievedStory.getStory_date();
-		String storyTime = recievedStory.getStory_time();
-	
-		String regId = phone.getReg_id();
-		String response = "";
-		
-		if("A".equals(os)){
-			HttpUtil http = new HttpUtil();
-			Map<String, String> map = new HashMap<String, String>();
-			map.put("registration_id", regId);
-			map.put("data.type", "Inbox");
-			map.put("data.story_id", storyId);
-			map.put("data.content", content);
-			map.put("data.story_date", storyDate);
-			map.put("data.story_time", storyTime);
-			response = http.doGcm("https://android.googleapis.com/gcm/send", map);	
-		}else if ("I".equals(os)){
-
-			JSONObject obj = new JSONObject();
-			obj.put("type", "Inbox");
-			obj.put("story_id", storyId);
-			obj.put("content", content);
-			obj.put("story_date", storyDate);
-			obj.put("story_time", storyTime);
+		//받을 대상 개수를 선정해서
+		int phoneCnt = storyMapper.getPhoneRegistrationCnt();
+		System.out.println("phoneCnt");
+		System.out.println(phoneCnt);
+		//랜덤하게 몇명을 보내는데
+		//전체 인원을 하루에 총 보내는 개수로 나눈다.
+		//그러면 확률상 하루에 한개는 이야기를 받을 수 있다.
+		for(int i=0; i<phoneCnt/(24*6); i++){
+			log.info(String.valueOf(i));
 			
-			ApnsHelper.sendApns(context, regId, "inbox", obj.toString(), "eting!!");
-			response = "apns";
+			PhoneDTO phone = storyMapper.getRandomPhone();
+			String phoneId = phone.getPhone_id();		
+			String os = phone.getOs();
+			
+			StoryDTO recievedStory = storyMapper.getRandomStory(phoneId); // 무작위로 이야기를 가져온다.
+			
+			String storyId = recievedStory.getStory_id();
+			String content = recievedStory.getContent();
+			String storyDate = recievedStory.getStory_date();
+			String storyTime = recievedStory.getStory_time();
+		
+			String regId = phone.getReg_id();
+			String response = "";
+			
+			if("A".equals(os)){
+				HttpUtil http = new HttpUtil();
+				Map<String, String> map = new HashMap<String, String>();
+				map.put("registration_id", regId);
+				map.put("data.type", "Inbox");
+				map.put("data.story_id", storyId);
+				map.put("data.content", content);
+				map.put("data.story_date", storyDate);
+				map.put("data.story_time", storyTime);
+				response = http.doGcm("https://android.googleapis.com/gcm/send", map);	
+			}else if ("I".equals(os)){
+	
+				JSONObject obj = new JSONObject();
+				obj.put("type", "Inbox");
+				obj.put("story_id", storyId);
+				obj.put("content", content);
+				obj.put("story_date", storyDate);
+				obj.put("story_time", storyTime);
+				
+				ApnsHelper.sendApns(context, regId, "inbox", obj.toString(), "eting!!");
+				response = "apns";
+			}
+			
+			log.info("");
+			log.info("to = "+phoneId);
+			log.info("story_id = "+storyId);
+			log.info("GCM = "+response);
+
 		}
-		
-		log.info("");
-		log.info("to = "+phoneId);
-		log.info("story_id = "+storyId);
-		log.info("GCM = "+response);
-		
 	}
 
 }

@@ -114,4 +114,9 @@ public interface StoryMapper {
 	 */
 	public PhoneDTO getRandomPhone();
 	
+	/*
+	 * 폰 전체 개수
+	 */
+	public Integer getPhoneRegistrationCnt();
+	
 }

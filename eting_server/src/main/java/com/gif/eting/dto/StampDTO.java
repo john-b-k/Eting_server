@@ -13,6 +13,7 @@ public class StampDTO {
 	private String stamp_order;
 	private String comment;
 	private String stamps;
+	private String phone_id;
 	
 	
 
@@ -98,5 +99,15 @@ public class StampDTO {
 	public void setStamp_url(String stamp_url) {
 		this.stamp_url = stamp_url;
 	}
+
+	public String getPhone_id() {
+		return phone_id;
+	}
+
+	public void setPhone_id(String phone_id) {
+		this.phone_id = phone_id;
+	}
+	
+	
 
 }
